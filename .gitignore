@@ -1,1 +1,5 @@
-.env
+.env.local
+/music
+.DS_Store
+songNames.csv
+songNotFound.csv
