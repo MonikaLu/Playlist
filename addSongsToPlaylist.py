@@ -6,7 +6,7 @@ BASEDIR = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(BASEDIR, '.env.local'))
 
 # Constants
-access_token=os.getenv('SPOTIFY_ACCESS_TOKEN')
+access_token=os.getenv('AUTHORIZATION')
 playlistId=os.getenv('PLAYLIST_ID')
 base_url = 'https://api.spotify.com/v1/search'
 
@@ -52,5 +52,6 @@ for songId in song_ids:
 add_tracks_response = requests.post(
     f'https://api.spotify.com/v1/playlists/{playlistId}/tracks',
     headers=headers,
-    json={'uris': [f'spotify:track:{id}' for id in filtered_ids]}
-)
+    json={'uris': [f'spotify:track:{id}' for id in filtered_ids]})
+
+# Add counter 5/10 songs completed
