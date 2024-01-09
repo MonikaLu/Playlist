@@ -5,7 +5,7 @@ dir = 'music'
 song_names_file = 'songNames.csv'
 deviants_file = 'songNotFound.csv'
 
-unused_words = ['audio', 'lyrics', '[FULL Audio]', 'MP3', '(lyrics)', '+']
+unused_words = ['audio', 'lyrics', '[FULL Audio]', 'MP3', '(lyrics)', '+', 'Audio', 'Lyrics', 'album', 'AUDIO']
 
 def remove_chars_from_strings(text):
     pattern = r'[\[\]\(\)]'
@@ -14,22 +14,6 @@ def remove_chars_from_strings(text):
         if text.__contains__(word):
             text = text.replace(word, '')
     return text
-    
-
-# def add_names_to_csv():
-#     with open(song_names_file, 'w') as file:
-#         file.write('Songs:' + '\n')
-#         for filename in os.listdir(dir):
-#             if filename.endswith(".mp3") and filename.__contains__("-"):
-#                 file.write(filename.replace('.mp3', '') + '\n')
-#         file.close()
-
-# def add_deviants_to_csv():
-#     with open(deviants_file, 'w') as file:
-#         file.write('Songs:' + '\n')
-#         for filename in os.listdir(dir):
-#             file.write(filename.replace('.mp3', '') + '\n')
-#         file.close()
         
 def add_songs_to_csv():
     with open(song_names_file, 'w') as normal_names, open(deviants_file, 'w') as deviants:
