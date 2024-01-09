@@ -42,6 +42,8 @@ for song in songNames:
     if tracks:
         song_ids.append(tracks[0]['id'])
         
+songs_successfully_added = 0
+        
 # Compare song_ids with existing_ids
 filtered_ids = []
 for songId in song_ids:
@@ -49,9 +51,14 @@ for songId in song_ids:
         filtered_ids.append(songId)
         
 
-add_tracks_response = requests.post(
+for id in filtered_ids:
+   add_tracks_response = requests.post(
     f'https://api.spotify.com/v1/playlists/{playlistId}/tracks',
     headers=headers,
-    json={'uris': [f'spotify:track:{id}' for id in filtered_ids]})
+    json={'uris': [f'spotify:track:{id}']})
+   if add_tracks_response.status_code == 201:
+       songs_successfully_added += 1
+       print(songs_successfully_added, "/", len(filtered_ids), "added!")
 
-# Add counter 5/10 songs completed
+if songs_successfully_added == 0:
+    print("No new songs are added!")
