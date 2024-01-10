@@ -1,5 +1,6 @@
 import pandas as pd
 import requests
+from requests.exceptions import RequestException
 import os
 from dotenv import load_dotenv
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
@@ -14,15 +15,23 @@ headers = {
     'Content-Type': 'application/json'
 }
 
-# Checks existing songs
-def get_playlist_tracks(playlist_id, headers):
+# Checks existing songs with pagination
+def get_existing_tracks(playlist_id, headers):
     playlist_url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
-    response = requests.get(playlist_url, headers=headers)
-    track_data = response.json()
-    existing_track_ids = [item['track']['id'] for item in track_data['items']]
-    return existing_track_ids
+    existing_tracks = []
+    while playlist_url:
+        try:
+            response = requests.get(playlist_url, headers=headers)
+            response.raise_for_status()
+            data = response.json()
+            existing_tracks.extend(item['track']['id'] for item in data['items'])
+            playlist_url = data.get('next')
+        except RequestException as e:
+            print(f"An error occurred: {e}")
+            break
+    return existing_tracks
 
-def getSongIds(songList):
+def getSongIdsFromSpotify(songList):
     song_ids = []
     for song in songList:
         params = {
@@ -44,8 +53,7 @@ def getFilteredList(songList, existing_ids):
             filtered_ids.append(songId)
     return filtered_ids
 
-def fetchSongs(songList):
-    filtered_ids = getFilteredList(songList)
+def add_songs_to_playlist(filtered_ids):
     songs_successfully_added = 0
     for id in filtered_ids:
         add_tracks_response = requests.post(
@@ -63,9 +71,11 @@ def fetchSongs(songList):
 # Data
 def main():
     chunk_size = 10  # Adjust based on your system's capabilities
-    existing_ids = get_playlist_tracks(playlistId, headers)
-    for chunk in pd.read_csv('songNames.csv', chunksize=chunk_size):
+    existing_ids = get_existing_tracks(playlistId, headers)
+    for chunk in pd.read_csv('nesten_ferdig.csv', sep='|', chunksize=chunk_size):
         songNames = chunk['Songs:'].tolist()
-        fetchSongs(getFilteredList(getSongIds(songNames), existing_ids))
+        all_song_ids = getSongIdsFromSpotify(songNames)
+        filtered_ids = getFilteredList(all_song_ids, existing_ids)
+        add_songs_to_playlist(filtered_ids)
         
 main()
