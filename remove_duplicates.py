@@ -20,6 +20,7 @@ headers = {
 
 correct_songs_playlist = os.getenv('CORRECT_SONGS_PLAYLIST_ID')
 new_attempt_songs_playlist = os.getenv('NEW_ATTEMPT_SONGS_PLAYLIST_ID')
+all_songs_playlist = os.getenv('ALL_SONGS_PLAYLIST_ID')
 
 
 def getSongIds(playlist_id):
@@ -66,10 +67,12 @@ def removeSongsFromPlaylist(listOfSongs, playlist):
             print(f"Error occurred in batch {i//batch_size + 1}:",
                   remove_tracks_response.status_code, remove_tracks_response.text)
 
+fetched_song_ids = []
 def main():
-    correct_songs = getSongIds(correct_songs_playlist)
     new_songs = getSongIds(new_attempt_songs_playlist)
-    overlapped_songs = comparePlaylists(new_songs, correct_songs)
+    all_songs = getSongIds(all_songs_playlist)
+    overlapped_songs = comparePlaylists(all_songs, new_songs)
+    # Remove overlapped songs from new_song playlist to reduce manual efforts to check for correct results in the playlist
     removeSongsFromPlaylist(overlapped_songs, new_songs)
 
 main()
